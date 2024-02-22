@@ -21,8 +21,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if u.Username == "" || u.Password == "" {
 		http.Error(w, "Usuario y contraseña son obligatorios", http.StatusBadRequest)
-	} else if u.Username != "julian" {
-		http.Error(w, "Usuario no encontrado", http.StatusNotFound)
 	} else {
 		tokenString, err := CreateToken(u.Username)
 		if err != nil {
