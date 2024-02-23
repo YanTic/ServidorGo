@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 )
 
@@ -17,14 +18,14 @@ type Credenciales struct {
 }
 
 func main() {
-	// servidorURL := os.Getenv("SERVIDORGO")
+	servidorURL := os.Getenv("SERVIDORGO")
 	cliente := &http.Client{}
-	URL := "http://localhost:80"
+	// URL := "http://localhost:80"
 
-	// if servidorURL == "" {
-	// 	fmt.Println("Variable de entorno SERVIDORGO no configurada")
-	// 	return
-	// }
+	if servidorURL == "" {
+		fmt.Println("Variable de entorno SERVIDORGO no configurada")
+		return
+	}
 
 	// Se crea la info que se va mandar al servidor
 	user := "usuario." + strconv.Itoa(rand.Intn(100))
@@ -38,7 +39,7 @@ func main() {
 	}
 
 	// Request a la ruta /login
-	request, err := http.NewRequest("POST", URL+"/login", bytes.NewBuffer(jsonPayload))
+	request, err := http.NewRequest("POST", servidorURL+"/login", bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -64,7 +65,7 @@ func main() {
 	// Request a la ruta /saludo , ahora usando datos por URL y no por JSON
 	datos := url.Values{}
 	datos.Add("nombre", user)
-	request, err = http.NewRequest("GET", URL+"/saludo?"+datos.Encode(), nil)
+	request, err = http.NewRequest("GET", servidorURL+"/saludo?"+datos.Encode(), nil)
 	if err != nil {
 		fmt.Println(err)
 		return
