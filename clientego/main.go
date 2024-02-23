@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -18,7 +19,7 @@ type Credenciales struct {
 func main() {
 	// servidorURL := os.Getenv("SERVIDORGO")
 	cliente := &http.Client{}
-	URL := "http://localhost:80/login"
+	URL := "http://localhost:80"
 
 	// if servidorURL == "" {
 	// 	fmt.Println("Variable de entorno SERVIDORGO no configurada")
@@ -36,7 +37,8 @@ func main() {
 		return
 	}
 
-	request, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonPayload))
+	// Request a la ruta /login
+	request, err := http.NewRequest("POST", URL+"/login", bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -50,12 +52,37 @@ func main() {
 	}
 	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println("---Imprimiendo respuesta del servidor---")
+	fmt.Println("---Imprimiendo respuesta del servidor (Ruta /login)---")
+	fmt.Println(string(body))
+
+	// Request a la ruta /saludo , ahora usando datos por URL y no por JSON
+	datos := url.Values{}
+	datos.Add("nombre", user)
+	request, err = http.NewRequest("GET", URL+"/saludo?"+datos.Encode(), nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	request.Header.Add("Authorization", "Bearer "+string(body))
+
+	response, err = cliente.Do(request)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer response.Body.Close()
+
+	body, err = io.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("---Imprimiendo respuesta del servidor (Ruta /saludo)---")
 	fmt.Println(string(body))
 }

@@ -43,6 +43,7 @@ func VerifyToken(tokenString string, username string) error {
 	if claims["iss"] != emisor {
 		return fmt.Errorf("ISS (emisor) incorrecto")
 	}
+	fmt.Printf("sub: %s | username: %s\n", claims["sub"], username)
 	if claims["sub"] != username {
 		return fmt.Errorf("SUB (usuario) incorrecto")
 	}
